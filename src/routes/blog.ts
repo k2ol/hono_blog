@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { getAllPosts, getPostBySlug, getRecentPosts } from '../utils/posts';
+import { getRelatedPosts } from '../utils/tags';
 
 const blog = new Hono();
 
@@ -209,7 +210,7 @@ blog.get('/posts/:slug', async (c) => {
             ${post.metadata.author ? ` by ${post.metadata.author}` : ''}
             ${post.metadata.tags && post.metadata.tags.length > 0 ? `
               <div class="post-tags">
-                Tags: ${post.metadata.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                Tags: ${post.metadata.tags.map(tag => `<a href="/tags/${encodeURIComponent(tag)}" class="tag">${tag}</a>`).join('')}
               </div>
             ` : ''}
           </div>
@@ -221,6 +222,8 @@ blog.get('/posts/:slug', async (c) => {
         <div class="back-link">
           <a href="/posts">← Back to all posts</a>
         </div>
+        
+        ${await generateRelatedPostsSection(post)}
       </main>
     </body>
     </html>
@@ -228,5 +231,36 @@ blog.get('/posts/:slug', async (c) => {
   
   return c.html(html);
 });
+
+async function generateRelatedPostsSection(currentPost: any): Promise<string> {
+  const relatedPosts = await getRelatedPosts(currentPost, 3);
+  
+  if (relatedPosts.length === 0) {
+    return '';
+  }
+  
+  return `
+    <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #eee;">
+      <h3>Related Posts</h3>
+      <div style="display: grid; gap: 20px;">
+        ${relatedPosts.map(post => `
+          <div style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <h4 style="margin: 0 0 8px 0;">
+              <a href="/posts/${post.slug}" style="color: #333; text-decoration: none;">${post.title}</a>
+            </h4>
+            <div style="color: #666; font-size: 0.9em; margin-bottom: 8px;">
+              ${post.date}${post.metadata.author ? ` by ${post.metadata.author}` : ''}
+            </div>
+            ${post.metadata.tags && post.metadata.tags.length > 0 ? `
+              <div style="margin-top: 8px;">
+                ${post.metadata.tags.map(tag => `<a href="/tags/${encodeURIComponent(tag)}" class="tag">${tag}</a>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
 
 export default blog;
