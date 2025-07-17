@@ -4,7 +4,7 @@ import { getAllTags, getPostsByTag } from '../utils/tags';
 const tags = new Hono();
 
 // Tags overview page
-tags.get('/tags', async (c) => {
+tags.get('/', async (c) => {
   const allTags = await getAllTags();
   
   const html = `
@@ -98,7 +98,7 @@ tags.get('/tags', async (c) => {
 });
 
 // Individual tag page
-tags.get('/tags/:tagName', async (c) => {
+tags.get('/:tagName', async (c) => {
   const tagName = decodeURIComponent(c.req.param('tagName'));
   const posts = await getPostsByTag(tagName);
   
