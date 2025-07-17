@@ -43,7 +43,15 @@ blog.get('/', async (c) => {
           recentPosts.map(post => `
             <article class="post-preview">
               <h3><a href="/posts/${post.slug}" class="post-title">${post.title}</a></h3>
-              <div class="post-meta">Published on ${post.date}</div>
+              <div class="post-meta">
+                Published on ${post.date}
+                ${post.metadata.author ? ` by ${post.metadata.author}` : ''}
+                ${post.metadata.tags && post.metadata.tags.length > 0 ? `
+                  <div class="post-tags">
+                    ${post.metadata.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
               <p class="post-excerpt">${post.excerpt}</p>
             </article>
           `).join('')
@@ -95,7 +103,15 @@ blog.get('/posts', async (c) => {
           allPosts.map(post => `
             <article class="post-item">
               <h3><a href="/posts/${post.slug}" class="post-title">${post.title}</a></h3>
-              <div class="post-meta">Published on ${post.date}</div>
+              <div class="post-meta">
+                Published on ${post.date}
+                ${post.metadata.author ? ` by ${post.metadata.author}` : ''}
+                ${post.metadata.tags && post.metadata.tags.length > 0 ? `
+                  <div class="post-tags">
+                    ${post.metadata.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
             </article>
           `).join('')
         }
@@ -157,11 +173,19 @@ blog.get('/posts/:slug', async (c) => {
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
         .header { border-bottom: 2px solid #333; margin-bottom: 30px; padding-bottom: 20px; }
         .post-meta { color: #666; font-size: 0.9em; margin-bottom: 30px; }
+        .post-tags { margin-top: 10px; }
+        .tag { display: inline-block; background: #e1f5fe; color: #0277bd; padding: 4px 8px; margin: 2px 4px 2px 0; border-radius: 4px; font-size: 0.8em; text-decoration: none; }
+        .tag:hover { background: #b3e5fc; }
         .post-content { margin-bottom: 40px; }
         .post-content h1, .post-content h2, .post-content h3 { color: #333; }
         .post-content pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
         .post-content code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
         .post-content blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 20px; color: #666; }
+        .post-content table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        .post-content th, .post-content td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .post-content th { background-color: #f2f2f2; font-weight: bold; }
+        .post-content img { max-width: 100%; height: auto; }
+        .post-content hr { border: none; border-top: 2px solid #eee; margin: 30px 0; }
         .nav { margin-bottom: 20px; }
         .nav a { margin-right: 20px; color: #333; text-decoration: none; }
         .nav a:hover { text-decoration: underline; }
@@ -180,7 +204,15 @@ blog.get('/posts/:slug', async (c) => {
       <main>
         <article>
           <h1>${post.title}</h1>
-          <div class="post-meta">Published on ${post.date}</div>
+          <div class="post-meta">
+            Published on ${post.date}
+            ${post.metadata.author ? ` by ${post.metadata.author}` : ''}
+            ${post.metadata.tags && post.metadata.tags.length > 0 ? `
+              <div class="post-tags">
+                Tags: ${post.metadata.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
           <div class="post-content">
             ${post.content}
           </div>

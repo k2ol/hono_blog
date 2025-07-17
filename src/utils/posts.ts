@@ -40,7 +40,10 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       content: htmlContent,
       date: metadata.date || new Date().toISOString().split('T')[0],
       excerpt: generateExcerpt(htmlContent),
-      metadata
+      metadata: {
+        ...metadata,
+        tags: metadata.tags || []
+      }
     };
   } catch (error) {
     console.error(`Error reading post ${slug}:`, error);
